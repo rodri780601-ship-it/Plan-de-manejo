@@ -1,0 +1,189 @@
+/* Estilos Modernos para Formulario Web PMFBN */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+body {
+    background-color: #eef2f5;
+    color: #333333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px 15px;
+    min-height: 100vh;
+}
+
+.form-container {
+    background-color: #ffffff;
+    width: 100%;
+    max-width: 850px;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    border-top: 6px solid #1e7e34;
+}
+
+.form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+}
+
+.form-header h2 {
+    color: #1e7e34;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.form-header p {
+    color: #6c757d;
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+.badge {
+    background-color: #1e7e34;
+    color: #ffffff;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.form-section {
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    padding: 22px;
+    margin-bottom: 25px;
+    background-color: #fafbfc;
+}
+
+.form-section legend {
+    font-weight: 700;
+    color: #1e7e34;
+    padding: 0 10px;
+    font-size: 15px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group.full-width {
+    grid-column: span 2;
+}
+
+label {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #495057;
+}
+
+input, select, textarea {
+    padding: 10px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    font-size: 14px;
+    background-color: #ffffff;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: #1e7e34;
+    box-shadow: 0 0 0 3px rgba(30, 126, 52, 0.15);
+}
+
+textarea {
+    resize: vertical;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.btn {
+    padding: 12px 26px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.btn-primary {
+    background-color: #1e7e34;
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    background-color: #155724;
+}
+
+.btn-secondary {
+    background-color: #e2e6ea;
+    color: #495057;
+}
+
+.btn-secondary:hover {
+    background-color: #dae0e5;
+}
+
+/* Formato optimizado para Impresión / Descarga PDF */
+@media print {
+    body {
+        background-color: #ffffff;
+        padding: 0;
+    }
+
+    .form-container {
+        box-shadow: none;
+        border: none;
+        padding: 0;
+        max-width: 100%;
+    }
+
+    .form-actions {
+        display: none !important;
+    }
+
+    .form-section {
+        background-color: #ffffff;
+        border: 1px solid #777777;
+        margin-bottom: 18px;
+        padding: 15px;
+    }
+
+    input, select, textarea {
+        border: none;
+        border-bottom: 1px solid #333333;
+        border-radius: 0;
+        padding: 4px 0;
+        background: transparent;
+        appearance: none;
+        -webkit-appearance: none;
+    }
+}
