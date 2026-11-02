@@ -1,0 +1,35 @@
+PMFBN - Plan de Manejo Forestal de Bosque Nativo (Ley N° 20.283)
+Aplicación web: HTML + CSS + JavaScript, sin dependencias externas.
+
+USO
+- Abra index.html en Chrome, Edge o Firefox actualizados (doble clic o desde un servidor web).
+- Los datos se guardan automáticamente en el navegador. Use "Exportar proyecto" (.json)
+  para respaldar o trabajar en otro equipo, y "Abrir proyecto" para recuperarlo.
+- El mapa base (OpenStreetMap, OpenTopoMap, imagen Esri, CARTO) requiere conexión a internet;
+  el resto de la aplicación (cálculos, gráficos, shapefiles, plano sin mapa base) funciona sin conexión.
+
+ESTRUCTURA
+  index.html          Página principal
+  css/styles.css      Estilos (pantalla e impresión)
+  js/util.js          Utilidades: estadística (t de Student), evaluador de funciones de volumen,
+                      ZIP, lectura/escritura XLSX, generador de PDF
+  js/catalogos.js     Listas desplegables extraídas del formulario oficial (comunas, flora y fauna
+                      en categoría de conservación, especies, series de suelo, actividades, etc.)
+  js/schema.js        Capítulos, cuadros, columnas y validaciones del PMFBN
+  js/app.js           Navegación, formularios, revisión, impresión
+  js/inventario.js    Capítulo 12: registro de parcelas, tabla de rodal (convencional y Bitterlich,
+                      monopódico y simpódico), estadígrafos, volúmenes, estados de desarrollo,
+                      cuadros 7.2, 7.4.2, 12.1.x
+  js/charts.js        Gráficos SVG del 12.3
+  js/geo.js           Proyección UTM WGS 84 (husos 18S/19S), geometría, lectura/escritura
+                      Shapefile (SHP/SHX/DBF/PRJ/CPG), KML y GeoJSON
+  js/mapa.js          Capítulo 13: mapa, capas CONAF, edición, carga de shapes, validación,
+                      exportación y plano en PDF
+
+CARTOGRAFÍA (según "Requerimientos técnicos para la presentación de cartografía digital
+georreferenciada ante CONAF", v6.0 2025, y Consideraciones PMFBN cap. 13)
+- Exporta una carpeta con el nombre del predio con cada capa como Capa_NombrePredio.shp/.shx/
+  .dbf/.prj/.cpg, Datum WGS 84, UTM huso 18 o 19 Sur, UTF-8, atributos en el orden de la
+  Tabla N° 1, más un .txt con tipo de solicitud, predio, rol, comuna y propietario.
+- Carga de shapefiles (.zip o archivos sueltos .shp/.dbf/.shx/.prj/.cpg), KML/KMZ y GeoJSON.
+- Plano en papel con norte, grilla UTM, escala gráfica y numérica y los 6 recuadros exigidos.
