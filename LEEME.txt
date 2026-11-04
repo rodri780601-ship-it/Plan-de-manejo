@@ -23,6 +23,7 @@ ESTRUCTURA
   js/charts.js        Gráficos SVG del 12.3
   js/geo.js           Proyección UTM WGS 84 (husos 18S/19S), geometría, lectura/escritura
                       Shapefile (SHP/SHX/DBF/PRJ/CPG), KML y GeoJSON
+  js/ejemplo.js       Proyecto de ejemplo completo con datos ficticios (botón "Cargar proyecto de ejemplo" en Inicio)
   js/mapa.js          Capítulo 13: mapa, capas CONAF, edición, carga de shapes, validación,
                       exportación y plano en PDF
 

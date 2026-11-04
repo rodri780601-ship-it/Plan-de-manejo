@@ -318,3 +318,24 @@ input:disabled { background: #f0f2ee; color: #999; }
   .pdoc .alert { display: none; }
   .firmas { break-inside: avoid; margin-top: 18mm; }
 }
+
+/* ---------- portada de acceso ---------- */
+body.locked > :not(#login):not(script) { display: none !important; }
+.login { display: none; position: fixed; inset: 0; z-index: 100; align-items: center; justify-content: center; padding: 16px; background: linear-gradient(160deg, var(--green-d), var(--green)); }
+body.locked .login { display: flex; }
+.login-card { width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 6px; padding: 28px 26px; background: var(--surface); border-radius: var(--radius); box-shadow: 0 10px 40px rgba(0, 0, 0, .3); color: var(--green); text-align: center; }
+.login-card svg { align-self: center; }
+.login-card h1 { color: var(--green-d); letter-spacing: .08em; }
+.login-sub { margin: 0 0 14px; color: var(--muted); font-size: 12.5px; }
+.login-card label { text-align: left; font-weight: 600; color: var(--ink); margin-top: 6px; }
+.login-card input { width: 100%; padding: 9px 10px; border: 1px solid var(--line-d); border-radius: 8px; background: #fff; }
+.login-card input:focus { outline: 2px solid var(--green); outline-offset: 1px; }
+.login-pass { display: flex; gap: 6px; }
+.login-pass .btn { color: var(--ink); }
+.login-err { margin: 6px 0 0; padding: 8px 10px; border-radius: 8px; background: var(--red-l); color: var(--red); font-size: 13px; text-align: left; }
+.login-go { margin-top: 14px; padding: 10px; background: var(--green); color: #fff; border-color: var(--green); cursor: pointer; }
+.login-demo { margin-top: 14px; padding: 8px 10px; border-radius: 8px; background: var(--amber-l); color: var(--ink); font-size: 12px; }
+.user-name { align-self: center; font-size: 12px; color: #cfe3cf; white-space: nowrap; }
+@media (max-width: 800px) { .user-name { display: none; } }
+button.login-demo { width: 100%; border: 1px dashed var(--amber); font: inherit; font-size: 12px; cursor: pointer; }
+button.login-demo:hover { background: #f7e3c2; }

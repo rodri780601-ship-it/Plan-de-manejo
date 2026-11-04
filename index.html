@@ -8,7 +8,24 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2 6 16h5l-6 9h9v5h4v-5h9l-6-9h5z' fill='%232f6b3f'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="css/styles.css">
 </head>
-<body>
+<body class="locked">
+  <section id="login" class="login" aria-label="Acceso">
+    <form id="login-form" class="login-card" autocomplete="off">
+      <svg viewBox="0 0 32 32" width="48" height="48" aria-hidden="true"><path d="M16 2 6 16h5l-6 9h9v5h4v-5h9l-6-9h5z" fill="currentColor"/></svg>
+      <h1>PMFBN</h1>
+      <p class="login-sub">Plan de Manejo Forestal de Bosque Nativo · Ley 20.283</p>
+      <label for="login-user">Usuario</label>
+      <input id="login-user" type="text" required autocomplete="username" autocapitalize="none" spellcheck="false">
+      <label for="login-pass">Clave</label>
+      <div class="login-pass">
+        <input id="login-pass" type="password" required autocomplete="current-password">
+        <button type="button" id="login-toggle" class="btn sm">Mostrar</button>
+      </div>
+      <p id="login-err" class="login-err" role="alert" hidden></p>
+      <button type="submit" class="btn primary login-go">Ingresar</button>
+      <button type="button" id="login-demo" class="login-demo" title="Ingresar con la cuenta de demostración"><b>Cuenta de demostración · clic para ingresar</b><br>Usuario: <code>mrojas</code> · Clave: <code>Bosque2025!</code></button>
+    </form>
+  </section>
   <header class="topbar">
     <button id="menu-btn" class="icon-btn menu" aria-label="Menú">☰</button>
     <div class="brand">
@@ -17,8 +34,10 @@
     </div>
     <div class="proj"><span id="proj-name">Proyecto</span><small id="saved"></small></div>
     <div class="top-actions">
+      <span id="user-name" class="user-name"></span>
       <button id="btn-rev" class="btn sm">Revisión</button>
       <button id="btn-export" class="btn sm primary">Exportar proyecto</button>
+      <button id="btn-logout" class="btn sm">Salir</button>
     </div>
   </header>
   <div class="layout">
@@ -27,6 +46,7 @@
   </div>
   <div id="print-area"></div>
 
+  <script src="js/login.js"></script>
   <script src="js/util.js"></script>
   <script src="js/catalogos.js"></script>
   <script src="js/schema.js"></script>
@@ -35,5 +55,6 @@
   <script src="js/inventario.js"></script>
   <script src="js/mapa.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/ejemplo.js"></script>
 </body>
 </html>
