@@ -220,7 +220,7 @@ const App = {
           h('button', { class: 'btn primary', onclick: () => App.go('sol') }, 'Comenzar / continuar'),
           h('button', { class: 'btn', onclick: () => fileIn.click() }, 'Abrir proyecto (.json)'),
           h('button', { class: 'btn', onclick: () => App.exportJSON() }, 'Exportar proyecto'),
-          h('button', { class: 'btn', onclick: () => App.cargarEjemplo() }, 'Cargar proyecto de ejemplo'),
+          h('button', { class: 'btn demo', title: 'Carga un Plan de Manejo completo con datos ficticios', onclick: () => App.cargarEjemplo() }, 'Proyecto de Ejemplo'),
           h('button', { class: 'btn ghost', onclick: () => App.nuevo() }, 'Nuevo proyecto'), fileIn)),
       h('section', { class: 'card' },
         h('h2', null, 'Tipo de actividades del Plan'),
