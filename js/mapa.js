@@ -959,10 +959,14 @@ const Carto = (() => {
     if (!baseOk) { g.fillStyle = '#a00'; g.font = `${mm(2.2)}px system-ui`; g.fillText('Mapa base no disponible (sin conexión o servidor sin permiso de exportación).', fx + mm(2), fy + fh - mm(1.5)); }
     return cv;
   }
-  function recuadros(g, fr, mm, o, usados, gi) {
-    const col = fr.col, X = mm(col.x), W = mm(col.w);
+  function recuadros(g, fr, mm0, o, usados, gi) {
+    const col = fr.col, X = mm0(col.x), W = mm0(col.w);
     const side = fr.W >= fr.H;
-    let y = mm(col.y);
+    let y = mm0(col.y);
+    let k = 1; // reducción de los recuadros cuando no caben en la columna lateral
+    const mm = v => mm0(v) * k;
+    let avisado = false;
+    const avisoLetra = () => { if (!avisado) toast('Con este papel y esta cantidad de datos, los recuadros del plano quedan con letra pequeña. Para mejor lectura use un papel mayor.', 'warn', 6000); avisado = true; };
     const ints = App.t('sol_int').filter(r => r.nombre), ubi = App.ubicacion();
     const rods = feats('Rodales').slice().sort((a, b) => String(a.p.N_Rodal).localeCompare(String(b.p.N_Rodal), 'es', { numeric: true }));
     const areas = feats('Area');
@@ -981,18 +985,69 @@ const Carto = (() => {
       const fit = (t, w) => { let s2 = String(t || ''); while (s2.length > 3 && g.measureText(s2).width > w) s2 = s2.slice(0, -2); return s2 + (s2 !== String(t || '') ? '…' : ''); };
       place(0, '1. ANTECEDENTES PREDIALES', (x, yy, w) => { [['Interesado/a', ints.map(i => i.nombre).join('; ')], ['Predio', App.f('pr_nombre')], ['Rol avalúo', App.roles().map(r => r.rol).join(', ')], ['Región', ubi.region], ['Provincia', ubi.provincia], ['Comuna', ubi.comuna]].forEach(([a, b], i) => { line(a + ':', x, yy + mm(i * 7.4), 2.1, true); g.font = `${mm(2.1)}px system-ui,sans-serif`; g.fillText(fit(b, w), x, yy + mm(i * 7.4 + 3)); }); });
       place(1, '2. ANTECEDENTES CARTOGRÁFICOS', (x, yy, w) => { const n = wrap('Base cartográfica: ' + o.baseCarto, x, yy, w, 2.1, 2.8); line(`Escala 1:${fmt(o.escala, 0)}`, x, yy + mm(2.8 * n + 2), 2.3, true); line(`Datum WGS 84 · UTM huso ${zona()} Sur`, x, yy + mm(2.8 * n + 5.6), 2.1); line(`Grilla UTM cada ${gi} m`, x, yy + mm(2.8 * n + 8.8), 2.1); });
-      place(2, '3. ANTECEDENTES TÉCNICOS', (x, yy, w) => { let k2 = yy; rods.concat(areas).slice(0, 9).forEach(f => { line(f.p.N_Rodal != null ? 'Rodal ' + f.p.N_Rodal : 'Área ' + (f.p.N_Area || ''), x, k2, 2.1); g.textAlign = 'right'; line(fmt(f.p.Sup_ha, 2) + ' ha', x + w, k2, 2.1); g.textAlign = 'left'; k2 += mm(3); }); line('Sup. total solicitada:', x, k2 + mm(1.5), 2.1, true); g.textAlign = 'right'; line(fmt(supSol, 2) + ' ha', x + w, k2 + mm(1.5), 2.1, true); g.textAlign = 'left'; line('Sup. predial según plano:', x, k2 + mm(5), 2.1, true); g.textAlign = 'right'; line(fmt(supPred, 2) + ' ha', x + w, k2 + mm(5), 2.1, true); g.textAlign = 'left'; });
-      place(3, '4. SIMBOLOGÍA', (x, yy) => { usados.slice(0, 11).forEach((L, i) => legendItem(g, L, x, yy + mm(i * 4) - mm(1), mm)); });
+      place(2, '3. ANTECEDENTES TÉCNICOS', (x, yy, w) => {
+        // todos los rodales y áreas: se elige el número de columnas que permite la letra más grande
+        const items = rods.concat(areas).map(f => [f.p.N_Rodal != null ? 'Rodal ' + f.p.N_Rodal : 'Área ' + (f.p.N_Area || ''), fmt(f.p.Sup_ha, 2) + ' ha']);
+        g.font = `${mm(2.1)}px system-ui,sans-serif`;
+        const anchoItem = mm(3) + items.reduce((m, [a, b]) => Math.max(m, g.measureText(a).width + g.measureText(b).width), 0);
+        const altoMM = rowH - 15, gap = mm(3); // se reserva el alto de las dos líneas de totales
+        let tab = null;
+        for (let nc = 1; nc <= 4; nc++) {
+          const filas = Math.max(1, Math.ceil(items.length / nc)), paso = Math.min(3, altoMM / filas), colW = (w - gap * (nc - 1)) / nc;
+          const s = Math.min(1, paso / 3, colW / anchoItem);
+          if (!tab || s > tab.s) tab = { filas, paso, colW, s };
+        }
+        if (tab.s < 0.8) avisoLetra();
+        items.forEach(([a, b], i) => {
+          const cx = x + Math.floor(i / tab.filas) * (tab.colW + gap), yi = yy + mm((i % tab.filas) * tab.paso);
+          line(a, cx, yi, 2.1 * tab.s); g.textAlign = 'right'; line(b, cx + tab.colW, yi, 2.1 * tab.s); g.textAlign = 'left';
+        });
+        const k2 = yy + mm(tab.filas * tab.paso);
+        line('Sup. total solicitada:', x, k2 + mm(1.5), 2.1, true); g.textAlign = 'right'; line(fmt(supSol, 2) + ' ha', x + w, k2 + mm(1.5), 2.1, true); g.textAlign = 'left'; line('Sup. predial según plano:', x, k2 + mm(5), 2.1, true); g.textAlign = 'right'; line(fmt(supPred, 2) + ' ha', x + w, k2 + mm(5), 2.1, true); g.textAlign = 'left'; });
+      place(3, '4. SIMBOLOGÍA', (x, yy, w) => {
+        // todas las capas: se elige el número de columnas que permite la letra más grande
+        g.font = `${mm(2.3)}px system-ui,sans-serif`;
+        const anchoItem = mm(9.5) + usados.reduce((m, L) => Math.max(m, g.measureText(L.n).width), 0);
+        const altoMM = rowH - 8.5;
+        let ley = null;
+        for (let nc = 1; nc <= 4; nc++) {
+          const filas = Math.ceil(usados.length / nc), paso = Math.min(4, altoMM / filas);
+          const s = Math.min(1, paso / 4, (w / nc) / anchoItem);
+          if (!ley || s > ley.s) ley = { filas, paso, s, nc };
+        }
+        if (ley.s < 0.8) avisoLetra();
+        const mmLeyenda = v => mm(v) * ley.s;
+        usados.forEach((L, i) => legendItem(g, L, x + Math.floor(i / ley.filas) * (w / ley.nc), yy + mm((i % ley.filas) * ley.paso) - mm(1), mmLeyenda));
+      });
       place(4, '5. ANTECEDENTES ADMINISTRATIVOS', (x, yy, w) => { line('Autor/a del Plan de Manejo:', x, yy, 2.1, true); g.font = `${mm(2.1)}px system-ui`; g.fillText(fit(App.f('au_nombre'), w), x, yy + mm(3)); g.beginPath(); g.moveTo(x + w * .4, yy + mm(10)); g.lineTo(x + w, yy + mm(10)); g.stroke(); line('Firma', x + w * .62, yy + mm(12.3), 1.9); if (o.autorPlano) line('Autor/a del plano: ' + o.autorPlano, x, yy + mm(16), 2); line('Interesado/a(s):', x, yy + mm(20), 2.1, true); g.font = `${mm(2.1)}px system-ui`; g.fillText(fit(ints.map(i => i.nombre).join('; '), w), x, yy + mm(23)); g.beginPath(); g.moveTo(x + w * .4, yy + mm(30)); g.lineTo(x + w, yy + mm(30)); g.stroke(); line('Firma', x + w * .62, yy + mm(32.3), 1.9); line('Fecha: ' + fechaLarga(o.fecha), x, yy + mm(37), 2); });
       place(5, '6. USO CONAF', (x, yy, w) => { line('N° de solicitud:', x, yy + mm(4), 2.2); g.beginPath(); g.moveTo(x, yy + mm(10)); g.lineTo(x + w, yy + mm(10)); g.stroke(); line('Fecha de ingreso:', x, yy + mm(18), 2.2); g.beginPath(); g.moveTo(x, yy + mm(24)); g.lineTo(x + w, yy + mm(24)); g.stroke(); });
       return;
     }
+    const hProp = 46, hCart = 26, hAdm = 50, hConaf = 40;
+    const tec = rods.concat(areas).map(f => [f.p.N_Rodal != null ? 'Rodal ' + f.p.N_Rodal : 'Área ' + (f.p.N_Area || ''), fmt(f.p.Sup_ha, 2)]);
+    // alto total (mm) de los recuadros 1 a 5 con el título; el 6 mantiene sus 8 x 4 cm
+    const filasSim = dos => dos ? Math.ceil(usados.length / 2) : usados.length;
+    const altoTec = filas => 18 + filas * 3.3;
+    const pila = (dos, filas) => 17 + (hProp + 2) + (hCart + 2) + (altoTec(filas) + 2) + (10 + filasSim(dos) * 4.4 + 2) + (hAdm + 2);
+    const disp = col.h - hConaf;
+    // se elige la combinación de columnas (recuadro 3 y simbología) que permite la letra más grande
+    g.font = `700 ${mm0(2.2)}px system-ui,sans-serif`;
+    const anchoPar = (a, b) => g.measureText(a).width + g.measureText(b).width;
+    const anchoTec = mm0(5) + tec.reduce((m, [a, b]) => Math.max(m, anchoPar(a, b)), anchoPar('Rodal / Área', 'Sup. (ha)'));
+    let plan = null;
+    for (let nc = 1; nc <= 4; nc++) {
+      const filas = Math.ceil(tec.length / nc), colW = (W - mm0(4) - mm0(3) * (nc - 1)) / nc;
+      for (const dos of [false, true]) {
+        const esc = Math.min(1, disp / pila(dos, filas), colW / anchoTec);
+        if (!plan || esc > plan.esc) plan = { esc, nc, filas, dos };
+      }
+    }
+    const simDos = plan.dos, hSim = 10 + filasSim(simDos) * 4.4, hTec = altoTec(plan.filas);
+    k = plan.esc;
+    if (k < 0.8) avisoLetra();
     // título
     g.fillStyle = '#111'; const tt = o.titulo || (o.tipo === 'rodales' ? 'PLANO DE RODALES' : 'PLANO PREDIAL');
     g.strokeRect(X, y, W, mm(15)); line(tt, X + mm(2), y + mm(5.5), 3.4, true); wrap('Plan de Manejo Forestal de Bosque Nativo · Ley N° 20.283', X + mm(2), y + mm(10), W - mm(4), 2.3); y += mm(17);
-    const avail = mm(col.h) - (y - mm(col.y));
-    const nRod = Math.min(rods.length + areas.length, 14);
-    const hProp = 46, hCart = 26, hTec = 18 + nRod * 3.3, hSim = 10 + Math.ceil(usados.length) * 4.4, hAdm = 50, hConaf = 40;
     box('1. ANTECEDENTES PREDIALES', hProp, (x, yy, w) => {
       [['Interesado/a', ints.map(i => i.nombre).join('; ')], ['Predio', App.f('pr_nombre')], ['Rol de avalúo', App.roles().map(r => r.rol).join(', ')], ['Región', ubi.region], ['Provincia', ubi.provincia], ['Comuna', ubi.comuna]]
         .forEach(([a, b], i) => { line(a + ':', x, yy + mm(i * 6.3), 2.3, true); g.font = `${mm(2.3)}px system-ui`; const tx = String(b || ''); let t = tx; while (g.measureText(t).width > w - mm(24) && t.length > 3) t = t.slice(0, -2); g.fillText(t + (t !== tx ? '…' : ''), x + mm(23), yy + mm(i * 6.3)); });
@@ -1003,16 +1058,25 @@ const Carto = (() => {
       line(`Datum WGS 84 · Proyección UTM · Huso ${zona()} Sur · Grilla ${gi} m`, x, yy + mm(2.9 * n + 5.3), 2.2);
     });
     box('3. ANTECEDENTES TÉCNICOS', hTec, (x, yy, w) => {
-      line('Rodal / Área', x, yy, 2.2, true); line('Superficie (ha)', x + w - mm(24), yy, 2.2, true);
-      let k2 = yy + mm(3.4);
-      rods.concat(areas).slice(0, 14).forEach(f => { line(f.p.N_Rodal != null ? 'Rodal ' + f.p.N_Rodal : 'Área ' + (f.p.N_Area || ''), x, k2, 2.2); g.textAlign = 'right'; line(fmt(f.p.Sup_ha, 2), x + w - mm(2), k2, 2.2); g.textAlign = 'left'; k2 += mm(3.3); });
-      if (rods.length + areas.length > 14) { line(`… y ${rods.length + areas.length - 14} más`, x, k2, 2.1); k2 += mm(3.3); }
+      const gap = mm(3), colW = (w - gap * (plan.nc - 1)) / plan.nc, colX = c => x + c * (colW + gap), der = c => colX(c) + colW - mm(2);
+      for (let c = 0; c < plan.nc; c++) {
+        if (c && c * plan.filas >= tec.length) break;
+        line('Rodal / Área', colX(c), yy, 2.2, true); g.textAlign = 'right'; line(plan.nc > 1 ? 'Sup. (ha)' : 'Superficie (ha)', der(c), yy, 2.2, true); g.textAlign = 'left';
+      }
+      tec.forEach(([a, b], i) => {
+        const c = Math.floor(i / plan.filas), yi = yy + mm(3.4 + (i % plan.filas) * 3.3);
+        line(a, colX(c), yi, 2.2); g.textAlign = 'right'; line(b, der(c), yi, 2.2); g.textAlign = 'left';
+      });
+      const k2 = yy + mm(3.4 + plan.filas * 3.3);
       g.beginPath(); g.moveTo(x, k2 - mm(2.2)); g.lineTo(x + w, k2 - mm(2.2)); g.stroke();
       line('Superficie total solicitada:', x, k2 + mm(1), 2.3, true); g.textAlign = 'right'; line(fmt(supSol, 2) + ' ha', x + w - mm(2), k2 + mm(1), 2.3, true); g.textAlign = 'left';
       line('Superficie predial según plano:', x, k2 + mm(4.4), 2.3, true); g.textAlign = 'right'; line(fmt(supPred, 2) + ' ha', x + w - mm(2), k2 + mm(4.4), 2.3, true); g.textAlign = 'left';
     });
-    box('4. SIMBOLOGÍA', hSim, (x, yy) => { usados.forEach((L, i) => legendItem(g, L, x, yy + mm(i * 4.4) - mm(1.5), mm)); });
-    const rest = (mm(col.y + col.h) - y) / mm(1) - hConaf - 2;
+    box('4. SIMBOLOGÍA', hSim, (x, yy, w) => {
+      const filas = filasSim(simDos), mmLeyenda = simDos ? v => mm(v) * 0.9 : mm; // en dos columnas la letra se reduce para que quepan los nombres
+      usados.forEach((L, i) => legendItem(g, L, x + (i >= filas ? w / 2 : 0), yy + mm((i % filas) * 4.4) - mm(1.5), mmLeyenda));
+    });
+    const rest = (mm0(col.y + col.h - hConaf) - y) / mm(1) - 2;
     box('5. ANTECEDENTES ADMINISTRATIVOS', Math.max(hAdm, rest), (x, yy, w) => {
       line('Autor/a del Plan de Manejo:', x, yy, 2.2, true); wrap(App.f('au_nombre') || '', x, yy + mm(3), w, 2.3);
       g.beginPath(); g.moveTo(x + w * 0.45, yy + mm(11)); g.lineTo(x + w, yy + mm(11)); g.stroke(); line('Firma', x + w * 0.68, yy + mm(13.5), 2);
@@ -1022,7 +1086,8 @@ const Carto = (() => {
       line('Fecha de elaboración: ' + fechaLarga(o.fecha), x, yy + mm(40), 2.2);
     });
     // Uso CONAF 8 x 4 cm
-    const cw = Math.min(W, mm(80)); y = Math.min(y, mm(col.y + col.h - hConaf));
+    k = 1;
+    const cw = Math.min(W, mm(80)); y = mm(col.y + col.h - hConaf);
     box('6. USO CONAF', hConaf, (x, yy, w) => { line('N° de solicitud:', x, yy + mm(4), 2.4); g.beginPath(); g.moveTo(x + mm(24), yy + mm(4.5)); g.lineTo(x + w, yy + mm(4.5)); g.stroke(); line('Fecha de ingreso:', x, yy + mm(14), 2.4); g.beginPath(); g.moveTo(x + mm(26), yy + mm(14.5)); g.lineTo(x + w, yy + mm(14.5)); g.stroke(); }, X + W - cw, cw);
   }
   function legendItem(g, L, x, y, mm) {
