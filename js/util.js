@@ -4,6 +4,9 @@
    ========================================================================== */
 'use strict';
 
+/* Aviso para documentos impresos y planos; en pantalla está en index.html */
+const AVISO_MAQUETA = 'Maqueta: este documento no es un instrumento publicado ni oficial.';
+
 /* ---------- DOM ---------- */
 function h(tag, attrs, ...kids) {
   const el = document.createElement(tag);

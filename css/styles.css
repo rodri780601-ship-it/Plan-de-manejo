@@ -7,6 +7,7 @@
   --red: #b23b2e; --red-l: #fbe9e6; --blue: #2c6e9e; --blue-l: #e3eef7; --radius: 10px;
   --shadow: 0 1px 2px rgba(20, 40, 25, .06), 0 2px 8px rgba(20, 40, 25, .05);
   --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --aviso-h: 30px;
   color-scheme: light;
 }
 * { box-sizing: border-box; }
@@ -30,7 +31,8 @@ h1, h2, h3, h4 { margin: 0; line-height: 1.25; }
 .icon-btn.menu { display: none; color: #fff; font-size: 20px; }
 
 /* ---------- estructura ---------- */
-.layout { display: flex; height: 100vh; padding-top: 56px; }
+.aviso-maqueta { position: fixed; top: 56px; left: 0; right: 0; height: var(--aviso-h); display: flex; align-items: center; justify-content: center; gap: .35em; flex-wrap: wrap; align-content: center; padding: 0 12px; background: var(--amber-l); border-bottom: 1px solid var(--amber); color: var(--ink); font-size: 12.5px; line-height: 1.25; text-align: center; z-index: 30; }
+.layout { display: flex; height: 100vh; padding-top: calc(56px + var(--aviso-h)); }
 .nav { width: 248px; flex: none; overflow-y: auto; background: var(--surface); border-right: 1px solid var(--line); padding: 10px 8px 24px; }
 .nav-i { display: flex; align-items: center; gap: 10px; width: 100%; padding: 7px 10px; border: 0; background: none; border-radius: 8px; text-align: left; cursor: pointer; color: var(--ink); }
 .nav-i:hover { background: var(--bg); }
@@ -270,7 +272,7 @@ input:disabled { background: #f0f2ee; color: #999; }
 @media (max-width: 900px) {
   .icon-btn.menu { display: block; }
   .brand span, .top-actions #btn-rev { display: none; }
-  .nav { position: fixed; top: 56px; bottom: 0; left: 0; z-index: 25; transform: translateX(-100%); transition: transform .2s; box-shadow: 4px 0 20px rgba(0, 0, 0, .15); }
+  .nav { position: fixed; top: calc(56px + var(--aviso-h)); bottom: 0; left: 0; z-index: 25; transform: translateX(-100%); transition: transform .2s; box-shadow: 4px 0 20px rgba(0, 0, 0, .15); }
   body.nav-open .nav { transform: none; }
   .view { padding: 16px 16px 60px; }
   .hero { grid-template-columns: 1fr; padding: 22px; }
@@ -283,13 +285,16 @@ input:disabled { background: #f0f2ee; color: #999; }
   .map-box { height: 60vh; }
 }
 
+@media (max-width: 520px) { :root { --aviso-h: 46px; } }
+
 /* ---------- impresión ---------- */
 #print-area { display: none; }
 @page { size: letter; margin: 14mm 13mm; }
 @media print {
   body { background: #fff; font-size: 10.5pt; }
-  body.printing .topbar, body.printing .layout, body.printing #toasts { display: none !important; }
+  body.printing .topbar, body.printing .aviso-maqueta, body.printing .layout, body.printing #toasts { display: none !important; }
   body.printing #print-area { display: block; }
+  .paviso { margin: 0 0 10px; padding: 4px 8px; border: 1.5px solid #a00; color: #a00; font-size: 10pt; text-align: center; }
   .pdoc { color: #000; width: 100%; max-width: 100%; overflow: hidden; }
   .pdoc * { max-width: 100%; }
   .phead { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #1f4a2c; padding-bottom: 6px; margin-bottom: 10px; }
@@ -327,6 +332,7 @@ body.locked .login { display: flex; }
 .login-card svg { align-self: center; }
 .login-card h1 { color: var(--green-d); letter-spacing: .08em; }
 .login-sub { margin: 0 0 14px; color: var(--muted); font-size: 12.5px; }
+.login-aviso { margin: 0 0 8px; padding: 8px 10px; border: 1px solid var(--amber); border-radius: 8px; background: var(--amber-l); color: var(--ink); font-size: 12.5px; }
 .login-card label { text-align: left; font-weight: 600; color: var(--ink); margin-top: 6px; }
 .login-card input { width: 100%; padding: 9px 10px; border: 1px solid var(--line-d); border-radius: 8px; background: #fff; }
 .login-card input:focus { outline: 2px solid var(--green); outline-offset: 1px; }

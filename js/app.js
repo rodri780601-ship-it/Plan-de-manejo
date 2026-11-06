@@ -578,7 +578,7 @@ function multiSelect(optSrc, value, onChange) {
 const Print = {
   open(title, content) {
     const area = $('#print-area'); area.innerHTML = '';
-    area.appendChild(h('div', { class: 'pdoc' }, content));
+    area.appendChild(h('div', { class: 'pdoc' }, h('p', { class: 'paviso' }, AVISO_MAQUETA), content));
     document.title = title;
     document.body.classList.add('printing');
     setTimeout(() => { window.print(); }, 250);

@@ -950,6 +950,12 @@ const Carto = (() => {
     g.font = `600 ${mm(2.8)}px system-ui,sans-serif`; g.fillText('Escala 1:' + fmt(scale, 0), sbx + sbw + mm(4), sby + mm(1.8));
     // recuadros
     recuadros(g, fr, mm, o, usados, gi);
+    // aviso de maqueta, en la esquina superior derecha del mapa
+    g.font = `700 ${mm(3)}px system-ui,sans-serif`;
+    const avW = g.measureText(AVISO_MAQUETA).width + mm(4), avX = fx + fw - avW - mm(2), avY = fy + mm(2);
+    g.fillStyle = 'rgba(255,255,255,.92)'; g.fillRect(avX, avY, avW, mm(6));
+    g.strokeStyle = '#a00'; g.lineWidth = mm(.35); g.strokeRect(avX, avY, avW, mm(6));
+    g.fillStyle = '#a00'; g.fillText(AVISO_MAQUETA, avX + mm(2), avY + mm(4.1));
     if (!baseOk) { g.fillStyle = '#a00'; g.font = `${mm(2.2)}px system-ui`; g.fillText('Mapa base no disponible (sin conexión o servidor sin permiso de exportación).', fx + mm(2), fy + fh - mm(1.5)); }
     return cv;
   }

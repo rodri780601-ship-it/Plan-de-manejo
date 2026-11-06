@@ -1,6 +1,8 @@
 PMFBN - Plan de Manejo Forestal de Bosque Nativo (Ley N° 20.283)
 Aplicación web: HTML + CSS + JavaScript, sin dependencias externas.
 
+AVISO: esta aplicación es una maqueta. No es un instrumento publicado ni oficial.
+
 USO
 - Abra index.html en Chrome, Edge o Firefox actualizados (doble clic o desde un servidor web).
 - Los datos se guardan automáticamente en el navegador. Use "Exportar proyecto" (.json)
